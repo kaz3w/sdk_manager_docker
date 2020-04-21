@@ -1,0 +1,2 @@
+#!/bin/sh
+/usr/bin/sdkmanager --cli --user ${NV_ACCOUNT} --password ${NV_PASSWORD} 
