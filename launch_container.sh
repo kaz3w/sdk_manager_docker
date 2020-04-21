@@ -16,5 +16,7 @@ docker run --privileged --rm -it \
            --env=QT_X11_NO_MITSHM=1 \
            --net=host \
            -u "jetpack"  \
+           --volume=/home/${USER}/Downloads:/Downloads:rw \
+           --add-host="`hostname`:127.0.1.1" \
            jetpack:latest \
            bash

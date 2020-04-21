@@ -6,8 +6,11 @@ ARG SDK_MANAGER_VERSION=1.0.1-5538
 ARG SDK_MANAGER_DEB=sdkmanager_${SDK_MANAGER_VERSION}_amd64.deb
 
 # add new sudo user
+USER root
 ENV USERNAME jetpack
 ENV HOME /home/$USERNAME
+ENV HOSTNAME ubuntu64vm
+
 RUN useradd -m $USERNAME && \
         echo "$USERNAME:$USERNAME" | chpasswd && \
         usermod --shell /bin/bash $USERNAME && \
@@ -15,16 +18,15 @@ RUN useradd -m $USERNAME && \
         mkdir /etc/sudoers.d && \
         echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME && \
         chmod 0440 /etc/sudoers.d/$USERNAME && \
-        # Replace 1000 with your user/group id
         usermod  --uid 1000 $USERNAME && \
-        groupmod --gid 1000 $USERNAME && \
-        echo  "192.168.1.174  ub64mbp"  >> /etc/hosts
+        groupmod --gid 1000 $USERNAME
 
 # install package
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         curl \
+	vim \
         sudo \
         apt-utils \
         tzdata \
@@ -68,6 +70,10 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+#RUN sh -c 'echo 127.0.1.1 $HOSTNAME >> /etc/hosts'
+RUN echo "127.0.1.1 $HOSTNAME" >> /etc/hosts
+RUN echo '127.0.1.1 HOSTNAME' >> /etc/hosts
 
 # install SDK Manager
 USER jetpack
