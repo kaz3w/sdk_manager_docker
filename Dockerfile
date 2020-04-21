@@ -72,8 +72,6 @@ ENV LC_ALL en_US.UTF-8
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 #RUN sh -c 'echo 127.0.1.1 $HOSTNAME >> /etc/hosts'
-RUN echo "127.0.1.1 $HOSTNAME" >> /etc/hosts
-RUN echo '127.0.1.1 HOSTNAME' >> /etc/hosts
 
 # install SDK Manager
 USER jetpack
