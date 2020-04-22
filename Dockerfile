@@ -79,6 +79,8 @@ COPY ${SDK_MANAGER_DEB} /home/${USERNAME}/
 COPY spawn_sdk_manager.sh /home/${USERNAME}/
 WORKDIR /home/${USERNAME}
 RUN sudo apt-get install -f /home/${USERNAME}/${SDK_MANAGER_DEB}
+RUN sed -i -e 's/#force_color_prompt=/force_color_prompt=/' .bashrc
+RUN sed -i -e 's/\\\[\\033\[01;32m\\\]\\u@\\h/\\\[\\033\[01;36m\\\]\\u@\\h/g' .bashrc
 
 USER root
 RUN echo "${USERNAME}:${USERNAME}" | chpasswd
