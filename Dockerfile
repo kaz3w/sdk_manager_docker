@@ -32,7 +32,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	qemu-user-static \
         apt-utils
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get install -y --no-install-recommends \
         curl \
 	vim \
         tzdata \
