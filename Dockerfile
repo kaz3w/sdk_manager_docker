@@ -23,12 +23,18 @@ RUN useradd -m $USERNAME && \
 
 # install package
 ENV DEBIAN_FRONTEND noninteractive
+
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
+	sudo \
         build-essential \
+	binfmt-support \
+	qemu-user-static \
+        apt-utils
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
 	vim \
-        sudo \
-        apt-utils \
         tzdata \
         git \
         bash-completion \
@@ -76,9 +82,14 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 # install SDK Manager
 USER jetpack
 COPY ${SDK_MANAGER_DEB} /home/${USERNAME}/
-COPY spawn_sdk_manager.sh /home/${USERNAME}/
+#COPY spawn_sdk_manager.sh /home/${USERNAME}/
+
+# prepare for mapping host 'Downloads' folder
 WORKDIR /home/${USERNAME}
+RUN rm -rf /home/${USERNAME}/Downloads
 RUN sudo apt-get install -f /home/${USERNAME}/${SDK_MANAGER_DEB}
+
+# change prompt text color
 RUN sed -i -e 's/#force_color_prompt=/force_color_prompt=/' .bashrc
 RUN sed -i -e 's/\\\[\\033\[01;32m\\\]\\u@\\h/\\\[\\033\[01;36m\\\]\\u@\\h/g' .bashrc
 
