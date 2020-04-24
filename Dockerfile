@@ -4,6 +4,24 @@ FROM ubuntu:18.04
 ARG SDK_MANAGER_VERSION=1.1.0-6343
 ARG SDK_MANAGER_DEB=sdkmanager_${SDK_MANAGER_VERSION}_amd64.deb
 
+# PROXIES
+ARG http_proxy=0.0.0.0
+
+ENV HTTP_PROXY=${http_proxy}
+ENV HTTPS_PROXY=${http_proxy}
+ENV APT_PROXY=${http_proxy}
+
+WORKDIR /etc
+
+RUN if ["${http_proxy}" = "0.0.0.0"]; \
+        then echo "NO_PROXY"; \
+        else touch /etc/apt/apt.conf && \
+                echo "Acquire::http::proxy \"${APT_PROXY}\";" > /etc/apt.apt.conf && \
+                echo "Acquire::https::proxy	\"${APT_PROXY}\";" >> /etc/apt/apt.conf && \
+                echo "Acquire::ftp::proxy	\"${APT_PROXY}\";" >> /etc/apt/apt.conf; \
+        fi;
+
+
 # add new sudo user
 USER root
 ENV USERNAME jetpack
@@ -68,6 +86,10 @@ RUN apt-get install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# pip related (via proxy)
+#RUN pip --proxy ${HTTP_PROXY} install pymodule
+
+
 # set locale
 RUN locale-gen en_US.UTF-8  
 ENV LANG en_US.UTF-8  
@@ -77,7 +99,7 @@ ENV LC_ALL en_US.UTF-8
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 # install SDK Manager
-USER jetpack
+USER ${USERNAME}
 
 # prepare for mapping host 'Downloads' folder
 WORKDIR /home/${USERNAME}
