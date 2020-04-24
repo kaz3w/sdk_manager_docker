@@ -31,7 +31,10 @@ ARG SDK_MANAGER_VERSION=1.x.y-nnnn
 To build a Docker image under the proxy environment,  override the ``http_proxy`` variable in the Docker command line
 
 ```
-$ docker build --build-arg http_proxy=http://PROXY_IP:PROXY_PORTn -t jetpack .
+$ docker build --build-arg http_proxy=http://PROXY_IP:PROXY_PORT -t jetpack .
+
+(e.g.)
+$ docker build --build-arg http_proxy=http://192.168.123.45:3142 -t jetpack .
 ```
 
 or update ARG http_proxy in [Dockerfile](https://github.com/kaz3w/sdk_manager_docker/blob/master/Dockerfile#L8) (Line:8).
