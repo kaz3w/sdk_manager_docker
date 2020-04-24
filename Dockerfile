@@ -76,15 +76,13 @@ ENV LC_ALL en_US.UTF-8
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
-#RUN sh -c 'echo 127.0.1.1 $HOSTNAME >> /etc/hosts'
-
 # install SDK Manager
 USER jetpack
-COPY ${SDK_MANAGER_DEB} /home/${USERNAME}/
-#COPY spawn_sdk_manager.sh /home/${USERNAME}/
 
 # prepare for mapping host 'Downloads' folder
 WORKDIR /home/${USERNAME}
+ADD https://dev.kaz3w.net/nvcache/${SDK_MANAGER_DEB} /home/${USERNAME}/${SDK_MANAGER_DEB}
+
 RUN rm -rf /home/${USERNAME}/Downloads
 RUN sudo apt-get install -f /home/${USERNAME}/${SDK_MANAGER_DEB}
 
