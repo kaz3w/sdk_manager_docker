@@ -1,2 +1,6 @@
 sdkmanager*.deb
 spawn_sdk_manager.sh
+sdkml3_jetpack_l4t_44_ga.json
+cond-test.sh
+test_launch.sh
+test.Dockerfile

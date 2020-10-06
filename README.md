@@ -8,7 +8,7 @@ This is a Dockerfile to use [NVIDIA SDK Manager](https://docs.nvidia.com/sdk-man
 
 ## Preparation
 ### Download NVIDIA SDK Manager
-This time, I used `sdkmanager_1.1.0-6343_amd64.deb` for installation.
+This time, I used `sdkmanager_1.3.0-7105_amd64.deb` for installation.
 Otherwise (if you want to use other specific version of SDK Manager), please download the package of NVIDIA SDK Manager from <https://developer.nvidia.com/nvidia-sdk-manager> and, put the package of NVIDIA SDK Manager in the same directory as the Dockerfile.
 
 ### Build Docker image

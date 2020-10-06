@@ -1,26 +1,19 @@
 FROM ubuntu:18.04
 
 # ARGUMENTS
-ARG SDK_MANAGER_VERSION=1.1.0-6343
+ARG SDK_MANAGER_VERSION=1.3.0-7105
 ARG SDK_MANAGER_DEB=sdkmanager_${SDK_MANAGER_VERSION}_amd64.deb
 
 # PROXIES
-ARG http_proxy=0.0.0.0
+ARG http_proxy="0.0.0.0"
 
 ENV HTTP_PROXY=${http_proxy}
 ENV HTTPS_PROXY=${http_proxy}
 ENV APT_PROXY=${http_proxy}
 
-WORKDIR /etc
-
-RUN if ["${http_proxy}" = "0.0.0.0"]; \
-        then echo "NO_PROXY"; \
-        else touch /etc/apt/apt.conf && \
-                echo "Acquire::http::proxy \"${APT_PROXY}\";" > /etc/apt.apt.conf && \
-                echo "Acquire::https::proxy	\"${APT_PROXY}\";" >> /etc/apt/apt.conf && \
-                echo "Acquire::ftp::proxy	\"${APT_PROXY}\";" >> /etc/apt/apt.conf; \
-        fi;
-
+# configure /etc/apt/apt.conf (for support PROXY)
+COPY prepare_apt_conf.sh .
+RUN ./prepare_apt_conf.sh
 
 # add new sudo user
 USER root
@@ -103,10 +96,12 @@ USER ${USERNAME}
 
 # prepare for mapping host 'Downloads' folder
 WORKDIR /home/${USERNAME}
-ADD https://dev.kaz3w.net/nvcache/${SDK_MANAGER_DEB} /home/${USERNAME}/${SDK_MANAGER_DEB}
+RUN mkdir -p /home/${USERNAME}/nvcache
+ADD https://dev.kaz3w.net/nvcache/${SDK_MANAGER_DEB} /home/${USERNAME}/nvcache/${SDK_MANAGER_DEB}
+ADD https://dev.kaz3w.net/nvcache/sdkml3_jetpack_l4t_44_ga.json /home/${USERNAME}/nvcache/sdkml3_jetpack_l4t_44_ga.json
 
 RUN rm -rf /home/${USERNAME}/Downloads
-RUN sudo apt-get install -f /home/${USERNAME}/${SDK_MANAGER_DEB}
+RUN sudo apt-get install -f /home/${USERNAME}/nvcache/${SDK_MANAGER_DEB}
 
 # change prompt text color
 RUN sed -i -e 's/#force_color_prompt=/force_color_prompt=/' .bashrc
@@ -115,4 +110,13 @@ RUN sed -i -e 's/\\\[\\033\[01;32m\\\]\\u@\\h/\\\[\\033\[01;36m\\\]\\u@\\h/g' .b
 USER root
 RUN echo "${USERNAME}:${USERNAME}" | chpasswd
 
-RUN rm /home/${USERNAME}/${SDK_MANAGER_DEB}
+RUN touch cp_sdkm2downloads.sh && \
+        echo '#!/bin/sh' >> cp_sdkm2downloads.sh && \
+        echo "sudo cp /home/${USERNAME}/nvcache/${SDK_MANAGER_DEB} /home/${USERNAME}/Downloads/nvidia/sdkm_downloads/" >> cp_sdkm2downloads.sh && \
+        echo "sudo cp /home/${USERNAME}/nvcache/sdkml3_jetpack_l4t_44_ga.json /home/${USERNAME}/Downloads/nvidia/sdkm_downloads/" >> cp_sdkm2downloads.sh && \
+        echo "sdkmanager" >> cp_sdkm2downloads.sh && \
+        echo "tail -f /dev/null" >> cp_sdkm2downloads.sh && \
+        chmod 755 cp_sdkm2downloads.sh && \
+        mv cp_sdkm2downloads.sh /usr/local/bin/cp_sdkm2downloads.sh
+
+ENTRYPOINT ["/usr/local/bin/cp_sdkm2downloads.sh"]
